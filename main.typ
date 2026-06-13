@@ -2,12 +2,6 @@
 #import "@preview/touying:0.7.4": *
 #import themes.simple: *
 
-#show: simple-theme.with(aspect-ratio: "16-9")
-
-== Todo
-- Was ist eine LTS Semantic?
-
-
 == Paper Ablauf
 1. Was ist RPC
 2. Warum sind Deadlocks blöd
@@ -23,22 +17,12 @@
 
 
 == Keywords
-- Message Passing: Query, Response, Cast
-- Remote Procedure Calls
-- Deadlock: Cyclic wait
-- Monitors: Analyse traffic
+- *Message Passing*: Query, Response, Cast
+- *Remote Procedure Calls*
+- *Deadlock*: Cyclic wait
+- *Monitors*: Analyse traffic
   - Probes: Communication with other monitors
-- Black-Box: No introspection
-
-
-== Umsetzung
-- Viele Visualisierungen vom Netzwerk wären nice
-  - Aus dem Paper?
-    - Easy aber arsch Quali
-  - Mit diesem Graphen CLI-Tool?
-  - Mit Anki?
-  - Mit Typst?
-
+- *Black-Box*: No introspection
 
 == Quirks
 - The monitored path might be different!
@@ -54,60 +38,106 @@
 - Deadlockset
 - Lemma 3.8 (Persistence of deadlocks).
 
-
-= Slides
-== Motivation
-- Deadlocks sind blöd
-- Bild von Deadlock
-
-
-== Setting
-- Netzwerk
-- (S)RPC- Bild von Deadlock
-- Blackbox
+== Todo
+- Probing
+- Process Calculi?
+- SRPC relation to RPC?
 
 
-== Monitors
-1. Distributed without introducing centralized component
-2. Blackbox and outline: Detect deadlocks by just observing the incoming and outgoing messages of the service they monitor
-3. Transparent: Don't alter the execution
-4. Precise: Detect Deadlock iff it existst
+
+#show: simple-theme.with(aspect-ratio: "16-9")
+
+= Correct Black-Box Monitors for Distributed Deadlock Detection: Formalisation and Implementation
+
+== Disecting the title
+- Given a network setting with communicating RPC Services (message passing)
+- RPC: Remote Procedure Call (Query, Response)
+- Deadlock: Cyclic wait in such a network
+- Distributed: No central authority (due to performance)
+- Black-box: No introspection of services, only communication behaviour
+- Monitors: Wrappers around service that observe communication
 
 
-== Formalism
-Network: N
-Monitored Network: hat(N)
-Transitions: N →^{α} N'
-Many Transitions(path): N →^{σ} N'
-Instrumentation: ℳ
-De-instrumentation: ℳ^(-1)
+== Agenda
+1. Contributions of the paper
+2. Formalising Processes & Services
+3. Formalising Networks
+4. Proof for Deadlock-detection
+5. Deadlock detection algorithm
+
+
+== Contributions
+- Formal model for RPC services
+- Formalised method for distributed, black-box, outline instrumentation
+- Monitoring algorithm that detects deadlock in a sound and complete way
+- Implementation of DDMon (for Erlang/OTP)
+
+
+// == Wanted Properties
+// 1. Distributed without introducing centralized component
+// 2. Blackbox and outline: Detect deadlocks by just observing the incoming and outgoing messages of the service they monitor
+// 3. Transparent: Don't alter the execution
+// 4. Precise: Detect Deadlock iff it existst
+
+
+== A Network – formally
+- A network $N$ with Transitions: $N →^α N'$
+- Or for multiple steps: $N →^σ N'$ which we call a _path_
+- A _monitored_ network: $hat(N)$
+- Instrumentation: $ℳ$ and  De-instrumentation: $ℳ^(-1)$
+- Messages in an instrumented network: $hat(N) →^hat(σ) hat(N')$
+- The instrumented network may have more messages!
+
+// == Transparency & Preciseness (p4)
+// TODO?
 
 = Nodes
 == Formalism: Services
-t := Q | R | c
-n := n0 | n1 | …
-n^⊥ := n | ⊥
-P := …
-q := ε | n(t) | q ++ q
-S := ⟨q^i | P | q^o⟩
-
+- The model is reduced to _Single-threaded Remote Procedure Calls_ (SRPC)
+$
+  "Communication tag" t & := Q | R | C \
+               "Name" n & := n₀ | n₁ | … \
+           "Client" n^⊥ & := n | ⊥ \
+            "Process" P & := … \
+              "Queue" q & := ε | n(t) | q ⧺ q \
+            "Service" S & := ⟨q^i | P | q^o⟩ \
+$
 
 == Formalism: LTS Semantic of abstract SRPC Process G
-G := Ready | Working | Locked
-γ := ?n(t) | !n(t) | τ
-We turn a Service S into a Process G
+$
+  G & := "Ready" | "Working"(n_c^⊥) | "Locked"(n_c^⊥, n_s) \
+  γ & := ?n(t) | !n(t) | τ
+$
+
+#figure(
+  caption: "LTS semantics of the abstract SRPC process G",
+  image("./assets/Fig1.png"),
+)
+
+// add the funny circly image?
 
 
-== Formalism: LTS Semantic of Service
-δ := ![n(t)]
-β := ?n(t) | !n(t) | τ(?n(t)) | τ(!n(t)) | τ(τ)
+== Formalism: LTS Semantic of Services
+$
+  δ & := ![n(t)] \
+  β & := ?n(t) | !n(t) | τ(?n(t)) | τ(!n(t)) | τ(τ)
+$
+
+#figure(
+  caption: "LTS semantics of services",
+  image("./assets/Fig4.png"),
+)
 
 = Networks
 == Formalism: Network
-- We write 𝑁(𝑛) to denote the service named 𝑛within 𝑁
-- We write N for the set of all networks.
-α := τ(γ \@ n) | n₀ -(t)-> n₁
+$
+  α := τ(γ \@ n) | n₀ –(t)→ n₁
+$
 
+#figure(
+  caption: "LTS semantics of services",
+  image("./assets/Fig5.png"),
+)
 
 == Formalism: Deadlocks
 - TODO
@@ -115,36 +145,46 @@ We turn a Service S into a Process G
 
 = Monitors
 == Formalism: Monitors
-hat(m) := ?n(t) | !n(t) | ?n(hat(p)) | !n(hat(p))
-hat(q) := ε | hat(m) | hat(q) ++ hat(q)
-hat(S) := ⟨hat(q) | P | S⟩
+$
+  hat(m) & := ?n(t) | !n(t) | ?n(hat(p)) | !n(hat(p)) \
+  hat(q) & := ε | hat(m) | hat(q) ++ hat(q) \
+  hat(S) & := ⟨hat(q) | P | S⟩ \
+$
 
 Monitored service action:
-hat(β) := β | ?n(hat(p)) | !n(hat(p)) | hat(τ)(?n(t)) | hat(τ)(!n(t)) | hat(τ)(?n(hat(p)))
-τ being the internal actions
+$
+  hat(β) := β | ?n(hat(p)) | !n(hat(p)) | hat(τ)(?n(t)) | hat(τ)(!n(t)) | hat(τ)(?n(hat(p)))
+$
+- $hat(p)$ is a probe
+- A monitor $hat(M)$
+// τ being the internal actions
+Monitor algorithm function: hat(𝓐): $(𝓜) x hat(𝔪) -> hat(𝓜) × hat(𝔮)$
+// - This function is total
 
-Monitor algorithm function: hat(𝓐)
-- This function is total
 
-
-== Formalis: Monitored Network action
-hat(α) := α | hat(τ)(γ \@ n) | n₀ -(hat(p))-> n₁
-monitored path: hat(σ)
+== Formalism: Monitored Network action
+$
+  hat(α) := α | hat(τ)(γ \@ n) | n₀ -(hat(p))-> n₁
+$
+monitored path: $hat(σ)$
+#figure(
+  caption: "LTS semantics of monitored networks",
+  image("./assets/Fig11.png"),
+)
 
 
 = Instrumentation
-Monitor instrumentation: 𝓜 : 𝓝 -> hat(𝓝)
-Deinstrumentation: 𝓜^(-1)
-Monitor stripping operation: hat(S)↓: $⟨hat(q) | hat(M) | ⟨q^i | P | q^o⟩⟩ = ⟨q^i ++ "filter"^i(hat(q)) | P | q^o ++ "filter"^o(hat(q)) ++ q^o⟩$
+- Monitor instrumentation: $𝓜 : 𝓝 -> hat(𝓝)$
+- Deinstrumentation: 𝓜^(-1)
+- Monitor stripping operation: $ hat(S)↓: ⟨hat(q) | hat(M) | ⟨q^i | P | q^o⟩⟩ = \ ⟨q^i ++ "filter"^i(hat(q)) | P | q^o ++ "filter"^o(hat(q)) ++ q^o⟩ $
 Stripping of monitor path: hat(σ)↓: …
 
 
 == Theorem 4.8 (Black-box instrumentation transparency — completeness).
 
-
 = The Algorithm
-- Monitor states hat(M): probe | waiting | alarm
-- Implementation of hat(𝓐)
+- Monitor states $hat(M)$ is a record with the fields "probe" | "waiting" | "alarm"
+- Implementation of $hat(𝓐)$
 
 
 = Wellformedness of SRPC
