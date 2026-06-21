@@ -71,15 +71,6 @@
 4. *Precise*: Detect Deadlock iff it existst
 
 
-// == A Network – formally
-// - A network $N$ with Transitions: $N →^α N'$
-// - Or for multiple steps: $N →^σ N'$ which we call a _path_
-// - A _monitored_ network: $hat(N)$
-// - Instrumentation: $ℳ$ and  De-instrumentation: $ℳ^(-1)$
-// - Messages in an instrumented network: $hat(N) →^hat(σ) hat(N')$
-// - The instrumented network may have more messages!
-
-
 = Nodes
 == Formalism: Services
 - The model is reduced to _Single-threaded Remote Procedure Calls_ (SRPC)
