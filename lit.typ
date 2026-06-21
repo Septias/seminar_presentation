@@ -46,4 +46,6 @@ The demand for mathematical precision in network states is heavily underscored b
 
 Finally, managing distributed deadlocks requires a precise understanding of the underlying resource dependencies, a concept comprehensively addressed by Moss (1981) @54distributed. Moss extended traditional single-level transaction systems to support nested transactions, introducing strict two-phase locking rules and state restoration algorithms to maintain failure atomicity and concurrency control. Although the primary paper is tailored toward RPC service deadlocks rather than database transaction management, Moss's framework for handling distributed locking and wait dependencies clarifies the complex hierarchical network behaviors that modern edge-chasing monitors must correctly interpret and navigate.
 
+- @43 defines a simulation relation for abstract processes.
+
 #bibliography("literature/all.bib")

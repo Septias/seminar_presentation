@@ -1,13 +1,6 @@
 #import "@preview/touying:0.7.4": *
 #import themes.simple: *
 
-== Paper Ablauf
-1. Was ist RPC
-2. Warum sind Deadlocks blöd
-3. Warum sind die schwer zu finden
-4. _false positives_ in sound static analysis
-
-
 == Aufbau
 1. Motivation
 2. Formalisierung erarbeiten
@@ -43,27 +36,17 @@
 - SRPC relation to RPC?
 
 
-
 #show: simple-theme.with(aspect-ratio: "16-9")
 
 = Correct Black-Box Monitors for Distributed Deadlock Detection: Formalisation and Implementation
 
-== Disecting the title
-- Given a network setting with communicating RPC Services (message passing)
-- RPC: Remote Procedure Call (Query, Response)
-- Deadlock: Cyclic wait in such a network
-- Distributed: No central authority (due to performance)
-- Black-box: No introspection of services, only communication behaviour
-- Monitors: Wrappers around service that observe communication
-
-
-== Agenda
-1. Contributions of the paper
-2. Formalising Processes & Services
-3. Formalising Networks
-4. Proof for Deadlock-detection
-5. Deadlock detection algorithm
-
+== Disecting The Title
+- We are given a network setting with communicating RPC Services
+- *RPC*: Remote Procedure Call (Query, Response, Cast)
+- *Deadlock*: Cyclic waiting for resources in such a network
+- *Distributed*: No central authority (due to performance)
+- *Blackbox*: No introspection of services, only communication behaviour
+- *Monitors*: Wrappers around service that observe communication
 
 == Contributions
 - Formal model for RPC services
@@ -72,23 +55,30 @@
 - Implementation of DDMon (for Erlang/OTP)
 
 
-// == Wanted Properties
-// 1. Distributed without introducing centralized component
-// 2. Blackbox and outline: Detect deadlocks by just observing the incoming and outgoing messages of the service they monitor
-// 3. Transparent: Don't alter the execution
-// 4. Precise: Detect Deadlock iff it existst
+== Agenda
+1. Formalising Processes & Services
+2. Formalising Networks
+3. Installing Monitors
+4. Proof for Deadlock-detection
+5. Deadlock Detection Algorithm
+6. Proof of Soundness & Completeness
 
 
-== A Network – formally
-- A network $N$ with Transitions: $N →^α N'$
-- Or for multiple steps: $N →^σ N'$ which we call a _path_
-- A _monitored_ network: $hat(N)$
-- Instrumentation: $ℳ$ and  De-instrumentation: $ℳ^(-1)$
-- Messages in an instrumented network: $hat(N) →^hat(σ) hat(N')$
-- The instrumented network may have more messages!
+== Wanted Properties
+1. *Distributed*: No centralized component
+2. *Blackbox and outline*: Detect deadlocks by just observing the incoming and outgoing messages of the service they monitor
+3. *Transparent*: Don't alter the execution
+4. *Precise*: Detect Deadlock iff it existst
 
-// == Transparency & Preciseness (p4)
-// TODO?
+
+// == A Network – formally
+// - A network $N$ with Transitions: $N →^α N'$
+// - Or for multiple steps: $N →^σ N'$ which we call a _path_
+// - A _monitored_ network: $hat(N)$
+// - Instrumentation: $ℳ$ and  De-instrumentation: $ℳ^(-1)$
+// - Messages in an instrumented network: $hat(N) →^hat(σ) hat(N')$
+// - The instrumented network may have more messages!
+
 
 = Nodes
 == Formalism: Services
@@ -101,8 +91,12 @@ $
               "Queue" q & := ε | n(t) | q ⧺ q \
             "Service" S & := ⟨q^i | P | q^o⟩ \
 $
+- The Behaviour of P must be compatible with an *abstract SRPC Process G*
+
+- TODO: underline lines?
 
 == Formalism: LTS Semantic of abstract SRPC Process G
+> Simulate a single Process P
 $
   G & := "Ready" | "Working"(n_c^⊥) | "Locked"(n_c^⊥, n_s) \
   γ & := ?n(t) | !n(t) | τ
@@ -117,6 +111,7 @@ $
 
 
 == Formalism: LTS Semantic of Services
+> Extend a process with queues (and search operations)
 $
   δ & := ![n(t)] \
   β & := ?n(t) | !n(t) | τ(?n(t)) | τ(!n(t)) | τ(τ)
@@ -138,8 +133,9 @@ $
   image("./assets/Fig5.png"),
 )
 
-== Formalism: Deadlocks
-- TODO
+== Formalism: Deadlocks Set
+- Todo: Deadlock of single node
+- Todo: Deadlock set
 
 
 = Monitors
@@ -156,6 +152,7 @@ $
 $
 - $hat(p)$ is a probe
 - A monitor $hat(M)$
+- A monitored Service: ⟨hat(q) | hat(M) | S⟩
 // τ being the internal actions
 Monitor algorithm function: hat(𝓐): $(𝓜) x hat(𝔪) -> hat(𝓜) × hat(𝔮)$
 // - This function is total
