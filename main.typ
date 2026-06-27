@@ -1,13 +1,6 @@
 #import "@preview/touying:0.7.4": *
 #import themes.simple: *
 
-== Aufbau
-1. Motivation
-2. Formalisierung erarbeiten
-3. Soundness & Completeness Proofs (Sketch?)
-4. Deadlock Algorithm
-
-
 == Ziel
 > Ich möchte, anhand der Typregeln ein paar nice Graphen zeigen
 > Ich möchte die formalen Properties aufzeigen
@@ -20,40 +13,39 @@
 - Dafür vielleicht den Rest einfach ausgrauen?
 - Oder doch einfach massiv viele Slides?
 
-== Todo
-- what is c
-- why service s?
-- SER-TI und SER-TO?
-- was macht der τ-wrapper?
-
-
-== Keywords
-- *Message Passing*: Query, Response, Cast
-- *Remote Procedure Calls*
-- *Deadlock*: Cyclic wait
-- *Monitors*: Analyse traffic
-  - Probes: Communication with other monitors
-- *Black-Box*: No introspection
-
-== Quirks
-- The monitored path might be different!
 
 == Proofs and Definitions
-- Criterion 2.1 (Monitor Instrumentation Transparency)
-  - Operational Correspondance vs. Simulation Relation
-  - soundess allows some extra steps
-- Criterion 2.2 (Preciseness of Deadlock Detection)
-  - completeness allows some extra steps
-- Lock
-- Deadlock
+2.1 Transparency of monitors p.5 (sound & complete)
+2.2 Preciseness of deadlock detection p.5 (sound & complete)
+3.6 Lock p.9
+3.7 Deadlock p.9
+4.4 Monitor instrumentation p.12
+4.5 Monitor de-instrumentation p.12
+4.6 Prop: M^(-1)(M(N)) = N
+4.8 Back-box instrumentation transparency complete
+4.11 Back-box instrumentation transparency sound
+5.1 Equivalence Between Deadlocks and Lock-on cycles
+5.2 Deadlock Detection Algortihm p.14
+6.1 Definition: Initial network and instrumentation p.16
+6.2 Definition: Client p.16
+6.3 Definition of well-formed SRPC client & server p.17
+6.7 !Complete lock knowledge p.18
+6.8 Alarm condition p.18
+6.9 Alarm condition leads to alarm p.18
+6.10 _Complete_ lock knowledge leads to invariant p.19
+6.11 Sound lock knowledge
+6.12 Sound lock knowlegdge is an invariant
+6.13 Deadlock Detection Preciseness
+6.14 Eventual Deadlock Reporting
+
+
 - Deadlockset
 - Lemma 3.8 (Persistence of deadlocks).
 
-== Todo
-- Probing
-- Process Calculi?
-- SRPC relation to RPC?
-
+== Fragen
+- Sollen wir paths noch zeigen?
+- Locked Definition hinzufügen?
+- Slide für "how to read LTS-semantics?"
 
 #show: simple-theme.with(aspect-ratio: "16-9")
 
@@ -68,10 +60,11 @@
 - *Monitors*: Wrappers around service that observe communication
 
 == Contributions
-1. A formal model for RPC services and communication
-2. A formal method to install  distributed, black-box, outline monitors
-3. A Monitoring algorithm that detects deadlock in a sound and complete way and proof its soundness
-4. Implementation of DDMon (for Erlang/OTP)
+1. Establish criteria for corretness of deadlock detection
+2. A formal model for RPC services and communication
+3. A formal method to install  distributed, black-box, outline monitors
+4. A Monitoring algorithm that detects deadlock in a sound and complete way and proof its soundness
+5. Implementation of DDMon (for Erlang/OTP)
 
 
 == Agenda
@@ -166,7 +159,7 @@ $
 $
 
 - A monitored Service: $⟨ hat(q) | hat(M) | S⟩$
-Monitor algorithm function: $hat(𝓐): hat(𝓜) × hat(𝔪) -> hat(𝓜) × hat(𝔮)$
+- Monitor algorithm function: $hat(𝓐): hat(𝓜) × hat(𝔪) -> hat(𝓜) × hat(𝔮)$
 
 == Slide
 #figure(
@@ -188,22 +181,31 @@ $
 
 
 = Instrumentation
+- We now discuss the process of transforming a network into a monitored network in which communication is observed by monitors
 - Monitor instrumentation: $𝓜 : 𝓝 -> hat(𝓝)$
 - Deinstrumentation: $𝓜^(-1): hat(𝓝) → 𝓝$
+- This transformation is _transparent_ (Theorem 4.11)
+
+#let rs = text(fill: red)[R]
+
+$
+  "(1)" & N(n) = #rs "implies" (𝓜(N))(n) = ⟨hat(q), hat(M), #rs⟩ \
+  "(2)" & (𝓜(N))(n) = ⟨hat(q), hat(M), #rs⟩ "implies" N(n) = #rs
+$
+
+// == Formalism: Deadlocks Set
+// - Todo: Deadlock of single node
+// - Todo: Deadlock set
 
 
-== Formalism: Deadlocks Set
-- Todo: Deadlock of single node
-- Todo: Deadlock set
-
-
-= The Algorithm
-- Monitor states $hat(M)$ is a record with the fields "probe" | "waiting" | "alarm"
-- Implementation of $hat(𝓐)$
+= Deadlock Detection using Probes
+- We use an edge-chasing inspired technique and probes
+- And send probes as soon as we appear to be locked
+- Monitor states $hat(M)$ is a record with the fields: { probe | waiting | alarm }
 
 #figure(
   caption: "Implementation of 𝓐",
-  image("./assets/Fig12.png"),
+  image("./assets/Fig12.png", width: 50%),
 ) <alg>
 
 
@@ -215,18 +217,35 @@ $
 
 
 = Correctness Proofs
-- Definition: Initial Network
-- Definition: Client
-- Definition: SRPC well-formedness
-- Definition: Wellformed SRPC Network
-- Theorem: Wellformedness as an _invariant_
-- Definition: Complete Lock Knowledge
-- Definition: Alarm Condition
-- Definition: Sound lock knowledge
-- Theorem: Sound lock knowledge is an _invariant_
-- Theorem 6.13 (Deadlock detection preciseness)
-- Theorem 6.13 (eventual deadlock reporting)
+- We strive for an algorithm that is both _sound_ and _complete_
+- Preliminaries:
+  - 6.1 Definition: Initial network and instrumentation
+  - 6.2 Definition: _Client_
+  - 6.3 Definition of well-formed SRPC _client & server_
+  - 6.4 Definition of well-formed SRPC _network_
+  - 6.5 Well-formedness is an invariant
+- Outline of the completeness-proof:
+  - We try to prove that if there is a lock, we see it in the network
+  - 6.7 Complete lock knowledge p.18
+  - 6.8 Alarm condition p.18
+  - 6.9 Alarm condition leads to alarm p.18
+  - 6.10 _Complete_ lock knowledge leads to invariant p.19
+
+== Soundnessproof
+- Outline of the soundness proof:
+  - 6.11 Sound lock knowledge
+  - 6.12 Sound lock knowlegdge is an invariant
+
+#figure(
+  caption: "Theorem 6.13 (Deadlock Detection Preciseness)",
+  image("./assets/t613.png"),
+)
 
 
 = Evaluation
 - Overhead is neglectible
+#figure(
+  image("./assets/comp.png", width: 50%),
+)
+
+= Thank you for listening!
