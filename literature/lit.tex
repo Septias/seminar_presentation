@@ -1,0 +1,116 @@
+\documentclass{llncs}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Working notes carried over from lit.typ:
+%
+% == Overview
+% - (widely accepted) Runtime verification(properties): [13]
+% - Systems: [6, 23]
+% - Monitoring Correctness: [28]
+% - Fairness of Components: [29]
+% - Edge chasing: [45, 54]
+% - Simulation relation: [45, 53]
+% - Algorithmic idea(seminal): [17, 44]
+% - Improvements: [16, 17, 19, 44, 54, 57]
+% - Process Calculi: [21, 22, 39-41, 47, 48]
+% - Delayed idea: [36, 42]  <- maybe these?
+% - Wichtig: [37]
+%
+% == Todo
+% - [17, 44] their deadlock mechanism is inline (cannot satisfy (2)(outline)
+%   and (3)transparency)
+% - 17deadlock_detection: complete, sound, distributed, Databases, Probes
+% - 30deadlock: ??
+% - 37formals: Formals
+% - 44distributed: Simple implementation using counters
+% - 54distributed: Inder, Probes, Edge-chasing
+%
+% - [43] defines a simulation relation for abstract processes.
+
+\begin{document}
+
+\title{Report: Correct Black-Box Monitors for Distributed
+Deadlock Detection}
+
+\author{Sebastian Kl\"ahn}
+
+\institute{Universität Freiburg\\
+\email{sk925@email.uni-freiburg.de}}
+
+\maketitle
+
+The Paper `Correct Black-Box Monitors for Distributed Deadlock Detection: Formalisation and Implementation` has two main contributions: Firstly, it provides a novel deadlock algorithm but even more importantly, it provides computer verified formalisation of nodes, networks, monitors and message passing in an RPC framework
+
+
+\section{The Edge-Chasing Paradigm and Protocol Optimization}
+The primary paper's decentralized monitoring logic is directly rooted in
+the ``edge-chasing`` paradigm popularized by Chandy, Misra, and Haas
+(1983)~\cite{17deadlock_detection}. Chandy et al.\ demonstrated that
+deadlocks could be identified without maintaining a centralized global
+\emph{wait-for graph} by propagating localized ``probe`` messages across
+the network to detect cycles among idle processes. Building upon this,
+Mitchell and Merritt~\cite{44distributed} introduced streamlined
+algorithms ensuring that only a single process in a cycle detects the
+deadlock, thereby vastly simplifying resolution. Crucially, the primary
+paper shifts away from forward-moving probes in favor of the
+backward-moving probe technique shown by Mitchell and Merritt. This
+architectural decision allows to sidestep tricky false positives
+that can happen in the forward-moving probe algorithm.
+
+Sinha and Natarajan (1985)~\cite{55priority} make edge-chasing efficient
+by incorporating priority-based timestamps. Their algorithm initiates
+probes only during ``antagonistic conflicts'' --- when a transaction
+waits for one with a lower priority --- drastically reducing
+communication overhead and preventing the detection of phantom deadlocks
+in fault-free environments. The primary paper leverages these
+optimization strategies to ensure its monitoring proxies remain
+lightweight and do not become bottlenecks in large-scale RPC systems.
+
+\section{Formal Verification and Operational Semantics}
+
+While early edge-chasing algorithms were conceptually strong, they often
+lacked the strict operational semantics required for verifiable
+black-box monitoring. To bridge this gap, the primary paper turns to the
+formalisms established by Keller (1976)~\cite{37formals}. Keller modeled
+parallel computations as \emph{transition systems}, where processes and
+computations are represented by discrete state transitions. By adopting
+Keller's Labelled Transition System (LTS) semantics, the primary paper
+rigorously models networks of Single-threaded Remote Procedure Call
+(SRPC) services. This mathematical grounding is what fundamentally
+enables the primary paper to mechanically prove monitor transparency and
+correctness in the Coq theorem prover.
+
+\section{Mitigating False Positives and System Anomalies}
+
+The demand for mathematical precision in network states is heavily
+underscored by Gligor and Shattuck (1980)~\cite{30deadlock}, who exposed
+the vulnerabilities of early distributed deadlock protocols. Through
+targeted counterexamples, they illustrated how arbitrary network delays
+and out-of-order graph updates generate ``ostensibly blocked
+transactions,'' ultimately leading to false (phantom) deadlocks. Gligor
+and Shattuck's cautionary findings directly inform the primary paper's
+stringent correctness criteria. By demanding both ``soundness'' and
+``completeness,'' the primary paper establishes verifiable invariants
+ensuring that monitors only report actual deadlocks, neutralizing the
+anomalies Gligor and Shattuck originally identified.
+
+\section{Transactional Dependencies and Concurrency Control}
+
+Finally, managing distributed deadlocks requires a precise understanding
+of the underlying resource dependencies, a concept comprehensively
+addressed by Moss (1981)~\cite{54distributed}. Moss extended traditional
+single-level transaction systems to support nested transactions,
+introducing strict two-phase locking rules and state restoration
+algorithms to maintain failure atomicity and concurrency control.
+Although the primary paper is tailored toward RPC service deadlocks
+rather than database transaction management, Moss's framework for
+handling distributed locking and wait dependencies clarifies the complex
+hierarchical network behaviors that modern edge-chasing monitors must
+correctly interpret and navigate.
+
+\bibliographystyle{splncs04}
+\bibliography{literature/all}
+
+\end{document}

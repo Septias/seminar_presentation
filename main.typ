@@ -1,52 +1,54 @@
 #import "@preview/touying:0.7.4": *
 #import themes.simple: *
 
-== Ziel
-> Ich möchte, anhand der Typregeln ein paar nice Graphen zeigen
-> Ich möchte die formalen Properties aufzeigen
-> Ich möchte den Algorithmus zeigen
+#let hidden = [
+  == Ziel
+  > Ich möchte, anhand der Typregeln ein paar nice Graphen zeigen
+  > Ich möchte die formalen Properties aufzeigen
+  > Ich möchte den Algorithmus zeigen
 
-== Pro Slide
-- Nicht zu sehr auf die Einzelheiten (die dort stehen)
-- Sondern mehr auf die Intuition und slides as "reference"
-- An sich aber eigentlich: auf slides nur wichtiges ↯
-- Dafür vielleicht den Rest einfach ausgrauen?
-- Oder doch einfach massiv viele Slides?
-
-
-== Proofs and Definitions
-2.1 Transparency of monitors p.5 (sound & complete)
-2.2 Preciseness of deadlock detection p.5 (sound & complete)
-3.6 Lock p.9
-3.7 Deadlock p.9
-4.4 Monitor instrumentation p.12
-4.5 Monitor de-instrumentation p.12
-4.6 Prop: M^(-1)(M(N)) = N
-4.8 Back-box instrumentation transparency complete
-4.11 Back-box instrumentation transparency sound
-5.1 Equivalence Between Deadlocks and Lock-on cycles
-5.2 Deadlock Detection Algortihm p.14
-6.1 Definition: Initial network and instrumentation p.16
-6.2 Definition: Client p.16
-6.3 Definition of well-formed SRPC client & server p.17
-6.7 !Complete lock knowledge p.18
-6.8 Alarm condition p.18
-6.9 Alarm condition leads to alarm p.18
-6.10 _Complete_ lock knowledge leads to invariant p.19
-6.11 Sound lock knowledge
-6.12 Sound lock knowlegdge is an invariant
-6.13 Deadlock Detection Preciseness
-6.14 Eventual Deadlock Reporting
+  == Pro Slide
+  - Nicht zu sehr auf die Einzelheiten (die dort stehen)
+  - Sondern mehr auf die Intuition und slides as "reference"
+  - An sich aber eigentlich: auf slides nur wichtiges ↯
+  - Dafür vielleicht den Rest einfach ausgrauen?
+  - Oder doch einfach massiv viele Slides?
 
 
-- Deadlockset
-- Lemma 3.8 (Persistence of deadlocks).
+  == Proofs and Definitions
+  2.1 Transparency of monitors p.5 (sound & complete)
+  2.2 Preciseness of deadlock detection p.5 (sound & complete)
+  3.6 Lock p.9
+  3.7 Deadlock p.9
+  4.4 Monitor instrumentation p.12
+  4.5 Monitor de-instrumentation p.12
+  4.6 Prop: M^(-1)(M(N)) = N
+  4.8 Back-box instrumentation transparency complete
+  4.11 Back-box instrumentation transparency sound
+  5.1 Equivalence Between Deadlocks and Lock-on cycles
+  5.2 Deadlock Detection Algortihm p.14
+  6.1 Definition: Initial network and instrumentation p.16
+  6.2 Definition: Client p.16
+  6.3 Definition of well-formed SRPC client & server p.17
+  6.7 !Complete lock knowledge p.18
+  6.8 Alarm condition p.18
+  6.9 Alarm condition leads to alarm p.18
+  6.10 _Complete_ lock knowledge leads to invariant p.19
+  6.11 Sound lock knowledge
+  6.12 Sound lock knowlegdge is an invariant
+  6.13 Deadlock Detection Preciseness
+  6.14 Eventual Deadlock Reporting
 
-== Fragen
-- Sollen wir paths noch zeigen?
-- Locked Definition hinzufügen?
-- Slide für "how to read LTS-semantics?"
 
+  - Deadlockset
+  - Lemma 3.8 (Persistence of deadlocks).
+
+  == Fragen
+  - Sollen wir paths noch zeigen?
+  - Locked Definition hinzufügen?
+  - Slide für "how to read LTS-semantics?"
+
+]
 #show: simple-theme.with(aspect-ratio: "16-9")
 
 = Correct Black-Box Monitors for Distributed Deadlock Detection: Formalisation and Implementation

@@ -16,6 +16,12 @@
               typst
               typstyle
               tinymist
+              (texliveSmall.withPackages (ps:
+                with ps; [
+                  llncs
+                  latexmk
+                  cm-super
+                ]))
             ];
           };
         }
