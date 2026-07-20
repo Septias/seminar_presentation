@@ -28,7 +28,3 @@
 - Learn first couple of sentences by heart (relieves tension)
 - Try to speak slowly
 - Abstract: Not needed
-
-
-## Fragen
-- Was ist `outline`?
