@@ -53,7 +53,7 @@
 
 = Correct Black-Box Monitors for Distributed Deadlock Detection: Formalisation and Implementation
 
-== Disecting the Title
+== Dissecting the Title
 - We are given a network setting with communicating RPC Services
 - *RPC*: Remote Procedure Call (Query, Response, Cast)
 - *Deadlock*: Cyclic waiting for resources in such a network
@@ -62,10 +62,10 @@
 - *Monitors*: Wrappers around service that observe communication
 
 == Contributions
-1. Establish criteria for corretness of deadlock detection
+1. Establish criteria for correctness of deadlock detection
 2. A formal model for RPC services and communication
-3. A formal method to install  distributed, black-box, outline monitors
-4. A Monitoring algorithm that detects deadlock in a sound and complete way and proof its soundness
+3. A formal method to install distributed, black-box, outline monitors
+4. A Monitoring algorithm that detects deadlock in a sound and complete way and proves its soundness
 5. Implementation of DDMon (for Erlang/OTP)
 
 
@@ -104,8 +104,8 @@ $
 
 
 
-== Formalism: LTS Semantic of abstract SRPC Process G
-- We define the possible states of an abstract Process G. The LTS Semantics are defined in @sem-process using the transitions labels γ.
+== Formalism: LTS Semantics of abstract SRPC Process G
+- We define the possible states of an abstract Process G. The LTS semantics are defined in @sem-process using the transitions labels γ.
 
 #v(1cm)
 $
@@ -121,15 +121,15 @@ $
 // add the funny circly image?
 
 
-== Formalism: LTS Semantic of Services
-- We extend a process P with queues and search operations to form a service S. The LTS-semantics in @lts-service are using the transition labels in β. δ is a transition label for queues.
+== Formalism: LTS Semantics of Services
+- We extend a process P with queues and search operations to form a service S. The LTS semantics in @lts-service are using the transition labels in β. δ is a transition label for queues.
 $
   δ & := ![n(t)] \
   β & := ?n(t) | !n(t) | τ(?n(t)) | τ(!n(t)) | τ(τ)
 $
 
 #figure(
-  caption: "LTS-semantics of services.",
+  caption: "LTS semantics of services.",
   image("./assets/Fig4.png"),
 ) <lts-service>
 
@@ -140,7 +140,7 @@ $
 $
 
 #figure(
-  caption: "LTS-semantics of a network.",
+  caption: "LTS semantics of a network.",
   image("./assets/Fig5.png"),
 )
 
@@ -161,9 +161,9 @@ $
 - A monitored Service: $⟨ hat(q) | hat(M) | S⟩$
 - Monitor algorithm function: $hat(𝓐): hat(𝓜) × hat(𝔪) -> hat(𝓜) × hat(𝔮)$
 
-== LTS semantics of Monitored Networks
+== LTS Semantics of Monitored Networks
 #figure(
-  caption: "LTS-semantics of monitored networks & visualization of communication.",
+  caption: "LTS semantics of monitored networks & visualization of communication.",
   image("./assets/Fig9_10.png"),
 )
 
@@ -243,7 +243,7 @@ $
 
 
 = Evaluation
-- Overhead is neglectible
+- Overhead is negligible
 #figure(
   image("./assets/comp.png", width: 50%),
 )
