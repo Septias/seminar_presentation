@@ -57,7 +57,7 @@
 - We are given a network setting with communicating RPC Services
 - *RPC*: Remote Procedure Call (Query, Response, Cast)
 - *Deadlock*: Cyclic waiting for resources in such a network
-- *Distributed*: No central authority (due to performance)
+- *Distributed*: No central authority
 - *Blackbox*: No introspection of services, only communication behaviour
 - *Monitors*: Wrappers around service that observe communication
 
@@ -70,22 +70,20 @@
 
 
 == Agenda
-1. Formalising Processes & Services
-2. Formalising Networks
-3. Installing Monitors
-4. Proof for Deadlock-detection
-5. Deadlock Detection Algorithm
-6. Proof of Soundness & Completeness
+1. Formalising processes & services
+2. Formalising networks
+3. Installing monitors
+4. A novel deadlock detection algorithm
+5. Proof of Soundness & Completeness
 
 
-== Wanted Properties
-1. *Distributed*: No centralized component
-2. *Blackbox and Outline*: Detect deadlocks by just observing the incoming and outgoing messages of the service they monitor
-3. *Transparent*: Don't alter the execution
-4. *Precise*: Detect Deadlock iff it existst
+// == Wanted Properties
+// 1. *Distributed*: No centralized component
+// 2. *Blackbox and Outline*: Detect deadlocks by just observing the incoming and outgoing messages of the service they monitor
+// 3. *Transparent*: Don't alter the execution
+// 4. *Precise*: Detect Deadlock iff it existst
 
 #let Name(block) = text(fill: gray, block)
-
 #set text(size: 18pt)
 
 = Nodes
@@ -116,7 +114,7 @@ $
 $
 
 #figure(
-  caption: "LTS semantics of the abstract SRPC process G",
+  caption: "LTS semantics of the abstract SRPC process G.",
   image("./assets/Fig1.png"),
 ) <sem-process>
 
@@ -124,14 +122,14 @@ $
 
 
 == Formalism: LTS Semantic of Services
-- We extend a process P with queues and search operations to form a service S. The lts-semantics in @lts-service are using the transition labels in β. δ is a transition label for queues.
+- We extend a process P with queues and search operations to form a service S. The LTS-semantics in @lts-service are using the transition labels in β. δ is a transition label for queues.
 $
   δ & := ![n(t)] \
   β & := ?n(t) | !n(t) | τ(?n(t)) | τ(!n(t)) | τ(τ)
 $
 
 #figure(
-  caption: "LTS semantics of services",
+  caption: "LTS-semantics of services.",
   image("./assets/Fig4.png"),
 ) <lts-service>
 
@@ -142,7 +140,7 @@ $
 $
 
 #figure(
-  caption: "LTS semantics of services",
+  caption: "LTS-semantics of a network.",
   image("./assets/Fig5.png"),
 )
 
@@ -163,23 +161,23 @@ $
 - A monitored Service: $⟨ hat(q) | hat(M) | S⟩$
 - Monitor algorithm function: $hat(𝓐): hat(𝓜) × hat(𝔪) -> hat(𝓜) × hat(𝔮)$
 
-== Slide
+== LTS semantics of Monitored Networks
 #figure(
-  caption: "LTS semantics of monitored networks & visualization of communication.",
+  caption: "LTS-semantics of monitored networks & visualization of communication.",
   image("./assets/Fig9_10.png"),
 )
 
 
-== Formalism: Monitored Network action
-- The lts-semantics given in @lts-monitor-nets is using the transition labels $hat(α)$
-$
-  hat(α) := α | hat(τ)(γ \@ n) | n₀ -(hat(p))-> n₁
-$
+// == Formalism: Monitored Network action
+// - The lts-semantics given in @lts-monitor-nets is using the transition labels $hat(α)$
+// $
+//   hat(α) := α | hat(τ)(γ \@ n) | n₀ -(hat(p))-> n₁
+// $
 
-#figure(
-  caption: "LTS semantics of monitored networks",
-  image("./assets/Fig11.png"),
-) <lts-monitor-nets>
+// #figure(
+//   caption: "LTS semantics of monitored networks",
+//   image("./assets/Fig11.png"),
+// ) <lts-monitor-nets>
 
 
 = Instrumentation
@@ -206,7 +204,7 @@ $
 - Monitor states $hat(M)$ is a record with the fields: { probe | waiting | alarm }
 
 #figure(
-  caption: "Implementation of 𝓐",
+  caption: "Implementation of 𝓐.",
   image("./assets/Fig12.png", width: 50%),
 ) <alg>
 
@@ -218,30 +216,30 @@ $
 
 
 
-= Correctness Proofs
-- We strive for an algorithm that is both _sound_ and _complete_
-- Preliminaries:
-  - 6.1 Definition: Initial network and instrumentation
-  - 6.2 Definition: _Client_
-  - 6.3 Definition of well-formed SRPC _client & server_
-  - 6.4 Definition of well-formed SRPC _network_
-  - 6.5 Well-formedness is an invariant
-- Outline of the completeness-proof:
-  - We try to prove that if there is a lock, we see it in the network
-  - 6.7 Complete lock knowledge p.18
-  - 6.8 Alarm condition p.18
-  - 6.9 Alarm condition leads to alarm p.18
-  - 6.10 _Complete_ lock knowledge leads to invariant p.19
+// = Correctness Proofs
+// - We strive for an algorithm that is both _sound_ and _complete_
+// - Preliminaries:
+//   - 6.1 Definition: Initial network and instrumentation
+//   - 6.2 Definition: _Client_
+//   - 6.3 Definition of well-formed SRPC _client & server_
+//   - 6.4 Definition of well-formed SRPC _network_
+//   - 6.5 Well-formedness is an invariant
+// - Outline of the completeness-proof:
+//   - We try to prove that if there is a lock, we see it in the network
+//   - 6.7 Complete lock knowledge p.18
+//   - 6.8 Alarm condition p.18
+//   - 6.9 Alarm condition leads to alarm p.18
+//   - 6.10 _Complete_ lock knowledge leads to invariant p.19
 
-== Soundnessproof
-- Outline of the soundness proof:
-  - 6.11 Sound lock knowledge
-  - 6.12 Sound lock knowlegdge is an invariant
+// == Soundnessproof
+// - Outline of the soundness proof:
+//   - 6.11 Sound lock knowledge
+//   - 6.12 Sound lock knowlegdge is an invariant
 
-#figure(
-  caption: "Theorem 6.13 (Deadlock Detection Preciseness)",
-  image("./assets/t613.png"),
-)
+// #figure(
+//   caption: "Theorem 6.13 (Deadlock Detection Preciseness)",
+//   image("./assets/t613.png"),
+// )
 
 
 = Evaluation
