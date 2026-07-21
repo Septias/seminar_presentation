@@ -54,7 +54,7 @@
 = Correct Black-Box Monitors for Distributed Deadlock Detection: Formalisation and Implementation
 
 == Dissecting the Title
-- We are given a network setting with communicating RPC Services
+- We are given a network setting with communicating RPC services
 - *RPC*: Remote Procedure Call (Query, Response, Cast)
 - *Deadlock*: Cyclic waiting for resources in such a network
 - *Distributed*: No central authority
@@ -65,7 +65,7 @@
 1. Establish criteria for correctness of deadlock detection
 2. A formal model for RPC services and communication
 3. A formal method to install distributed, black-box, outline monitors
-4. A Monitoring algorithm that detects deadlock in a sound and complete way and proves its soundness
+4. A monitoring algorithm that detects deadlock in a sound and complete way and proves its soundness
 5. Implementation of DDMon (for Erlang/OTP)
 
 
@@ -74,7 +74,8 @@
 2. Formalising networks
 3. Installing monitors
 4. A novel deadlock detection algorithm
-5. Proof of Soundness & Completeness
+// 5. Proof of soundness & completeness
+5. Evaluation in simulated networks
 
 
 // == Wanted Properties
@@ -100,7 +101,7 @@ $
   &&& Name("Service") && S & := ⟨q^i | P | q^o⟩ \
 $
 #v(1cm)
-- The Behaviour of P must be compatible with an *abstract SRPC Process G*
+- The behaviour of P must be compatible with an *abstract SRPC Process G*
 
 
 
@@ -122,7 +123,7 @@ $
 
 
 == Formalism: LTS Semantics of Services
-- We extend a process P with queues and search operations to form a service S. The LTS semantics in @lts-service are using the transition labels in β. δ is a transition label for queues.
+- We extend a process P with queues and search operations to form a service S. The LTS semantics in @lts-service are using the transition labels β. δ is a transition label for queues.
 $
   δ & := ![n(t)] \
   β & := ?n(t) | !n(t) | τ(?n(t)) | τ(!n(t)) | τ(τ)
@@ -135,37 +136,36 @@ $
 
 = Networks
 == Formalism: Network
+- We define a network N with nodes n and its LTS semantics in @lts-network using the transition labels α.
+
+#v(1fr)
 $
   α := τ(γ \@ n) | n₀ –(t)→ n₁
 $
-
+#v(1fr)
 #figure(
   caption: "LTS semantics of a network.",
-  image("./assets/Fig5.png"),
-)
+  image("./assets/Fig5.png", width: 70%),
+) <lts-network>
 
 = Monitors
 == Formalism: Monitors
-- We define a monitored Service Ŝ:
+- We define a monitored Service $Ŝ$, composed of a que $hat(q)$ and monitor-state $hat(M)$:
 $
   hat(m) & := ?n(t) | !n(t) | ?n(hat(p)) | !n(hat(p)) \
   hat(q) & := ε | hat(m) | hat(q) ⧺ hat(q) \
-  hat(S) & := ⟨hat(q) | P | S⟩ \
+  hat(S) & := ⟨hat(q) | hat(M) | S⟩ \
 $
 
-- With Monitored service action:
-$
-  hat(β) := β | ?n(hat(p)) | !n(hat(p)) | hat(τ)(?n(t)) | hat(τ)(!n(t)) | hat(τ)(?n(hat(p)))
-$
+// $
+//   hat(β) := β | ?n(hat(p)) | !n(hat(p)) | hat(τ)(?n(t)) | hat(τ)(!n(t)) | hat(τ)(?n(hat(p)))
+// $
 
-- A monitored Service: $⟨ hat(q) | hat(M) | S⟩$
-- Monitor algorithm function: $hat(𝓐): hat(𝓜) × hat(𝔪) -> hat(𝓜) × hat(𝔮)$
+- We say there exists a generic monitor algorithm function: $hat(𝓐): hat(𝓜) × hat(𝔪) -> hat(𝓜) × hat(𝔮)$ which our deadlock detection algorithm is an implementation of.
+
 
 == LTS Semantics of Monitored Networks
-#figure(
-  caption: "LTS semantics of monitored networks & visualization of communication.",
-  image("./assets/Fig9_10.png"),
-)
+#image("./assets/Fig9_10.png")
 
 
 // == Formalism: Monitored Network action
@@ -181,7 +181,7 @@ $
 
 
 = Instrumentation
-- We now discuss the process of transforming a network into a monitored network in which communication is observed by monitors
+- We now discuss the process of transforming a network into a monitored network in which communication is observed by monitors.
 - Monitor instrumentation: $𝓜 : 𝓝 -> hat(𝓝)$
 - Deinstrumentation: $𝓜^(-1): hat(𝓝) → 𝓝$
 - This transformation is _transparent_ (Theorem 4.11)
@@ -199,19 +199,23 @@ $
 
 
 = Deadlock Detection using Probes
-- We use an edge-chasing inspired technique and probes
-- And send probes as soon as we appear to be locked
-- Monitor states $hat(M)$ is a record with the fields: { probe | waiting | alarm }
+
+== Formalism: The Deadlock Detection Algorithm
+- We use an *edge-chasing* technique and *probes*
+- A probe is a message between monitors to "check" the blocking behaviour
+- These probes are sent as soon as we appear locked and provoke an alarm when received back
+// - Monitor states $hat(M)$ is a record with the fields: { probe | waiting | alarm }
 
 #figure(
   caption: "Implementation of 𝓐.",
-  image("./assets/Fig12.png", width: 50%),
+  image("./assets/Fig12.png", width: 40%),
 ) <alg>
 
 
+== Example: The Deadlock Detection Algorithm
 #figure(
   caption: "Deadlock detection algorithm example with three nodes.",
-  image("./assets/Fig13.png"),
+  image("./assets/Fig13.png", width: 50%),
 ) <example>
 
 
@@ -243,9 +247,11 @@ $
 
 
 = Evaluation
-- Overhead is negligible
+
+== Deadlock Detection in Simulated Networks
+// - Overhead is negligible
 #figure(
-  image("./assets/comp.png", width: 50%),
+  image("./assets/comp.png", width: 65%),
 )
 
 = Thank you for listening!
